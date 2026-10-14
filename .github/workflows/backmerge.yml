@@ -55,6 +55,17 @@ jobs:
           # means the same thing: there is no way to point this at main while it levels something else,
           # which is what using the dispatched ref would allow.
           MAIN_SHA="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq '.object.sha')"
+          # A fresh fork may not have adopted the upstream testing branch yet. Treat that as no work,
+          # rather than failing the first main build while looking up a ref that does not exist.
+          if ! DEV_SHA="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/dev" --jq '.object.sha' 2>/dev/null)"; then
+            echo "No dev branch exists yet; nothing to back-merge."
+            {
+              echo "### Back-merge"
+              echo
+              echo "No \`dev\` branch exists yet, so there was nothing to compare or update."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           COMPARE="repos/${GITHUB_REPOSITORY}/compare/dev...${MAIN_SHA}"
           # What main has and dev does not, then the other way round.
           AHEAD="$(gh api "$COMPARE" --jq '.ahead_by')"
