@@ -9781,10 +9781,10 @@ internal enum class SettingsCardPosition {
  * border rather than like it was being pointed at.
  */
 internal fun settingsCardRestingRadius(position: SettingsCardPosition, top: Boolean): Dp = when {
-    position == SettingsCardPosition.Single -> 22.dp
-    position in setOf(SettingsCardPosition.GroupedSingle, SettingsCardPosition.Top) && top -> 26.dp
-    position in setOf(SettingsCardPosition.GroupedSingle, SettingsCardPosition.Bottom) && !top -> 26.dp
-    else -> 8.dp
+    position == SettingsCardPosition.Single -> 16.dp
+    position in setOf(SettingsCardPosition.GroupedSingle, SettingsCardPosition.Top) && top -> 24.dp
+    position in setOf(SettingsCardPosition.GroupedSingle, SettingsCardPosition.Bottom) && !top -> 24.dp
+    else -> 6.dp
 }
 
 /** The shape a card rests at, for something that has to be drawn around one. */
@@ -10646,7 +10646,7 @@ internal fun expressiveClickableCardShape(
     val pressed by interactionSource.collectIsPressedAsState()
     val topRadius by animateDpAsState(
         // Pressed is the one radius that is not a resting one: the card swells to show it took the tap.
-        targetValue = if (pressed) 30.dp else settingsCardRestingRadius(position, top = true),
+        targetValue = if (pressed) 28.dp else settingsCardRestingRadius(position, top = true),
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioNoBouncy,
             stiffness = Spring.StiffnessMedium,
@@ -10654,7 +10654,7 @@ internal fun expressiveClickableCardShape(
         label = "clickable-card-top-corner",
     )
     val bottomRadius by animateDpAsState(
-        targetValue = if (pressed) 30.dp else settingsCardRestingRadius(position, top = false),
+        targetValue = if (pressed) 28.dp else settingsCardRestingRadius(position, top = false),
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioNoBouncy,
             stiffness = Spring.StiffnessMedium,
