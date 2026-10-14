@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: android-build-${{ github.ref }}
@@ -41,16 +41,42 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Configure Keystore
+        run: |
+          KEYSTORE_PATH="$RUNNER_TEMP/release.jks"
+          keytool -genkeypair -v -keystore "$KEYSTORE_PATH" -alias rootmygalaxy -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=RootMyGalaxyNext, O=ProofPage, C=KR"
+          echo "KEYSTORE_FILE=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+          echo "KEYSTORE_TYPE=PKCS12" >> "$GITHUB_ENV"
+          echo "KEYSTORE_PASSWORD=android" >> "$GITHUB_ENV"
+          echo "KEY_ALIAS=rootmygalaxy" >> "$GITHUB_ENV"
+          echo "KEY_PASSWORD=android" >> "$GITHUB_ENV"
+
       - name: Run unit tests
         run: ./gradlew :app:testDebugUnitTest --no-daemon
 
-      - name: Build debug APK
-        run: ./gradlew :app:assembleDebug --no-daemon
+      - name: Build APKs
+        run: ./gradlew assembleDebug assembleRelease --no-daemon
 
-      - name: Upload installable APK
+      - name: Stage APKs
+        run: |
+          mkdir -p release-apks
+          VERSION_NAME="$(grep -oE 'appVersionBase[[:space:]]*=[[:space:]]*"[^"]+"' app/build.gradle.kts | head -n 1 | cut -d'"' -f2)"
+          cp app/build/outputs/apk/release/*.apk "release-apks/RootMyGalaxyNext-${VERSION_NAME}.apk"
+          cp app/build/outputs/apk/debug/*.apk "release-apks/RootMyGalaxyNext-${VERSION_NAME}-debug.apk"
+
+      - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Root-My-Galaxy-Next-${{ github.sha }}
-          path: app/build/outputs/apk/debug/*.apk
+          name: RootMyGalaxyNext-apks
+          path: release-apks/*.apk
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION_NAME="$(grep -oE 'appVersionBase[[:space:]]*=[[:space:]]*"[^"]+"' app/build.gradle.kts | head -n 1 | cut -d'"' -f2)"
+          TAG="v${VERSION_NAME}"
+          gh release upload "$TAG" release-apks/*.apk --clobber || gh release create "$TAG" release-apks/*.apk --title "Release $TAG" --notes "Release $TAG (Debug & Release builds)"
+
