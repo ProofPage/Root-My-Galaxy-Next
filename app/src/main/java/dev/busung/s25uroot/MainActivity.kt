@@ -1783,10 +1783,10 @@ private fun AppNavBar(
     ) {
         Surface(
             shape = RoundedCornerShape(50),
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.94f),
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            tonalElevation = 0.dp,
-            shadowElevation = 6.dp,
+            tonalElevation = 2.dp,
+            shadowElevation = 8.dp,
         ) {
             Row(
                 modifier = Modifier
@@ -2003,6 +2003,7 @@ private fun OverviewPage(
                     painter = painterResource(R.drawable.ic_app_logo),
                     contentDescription = null,
                     modifier = Modifier.size(36.dp),
+                    tint = MaterialTheme.colorScheme.primary,
                 )
                 // The name and the build are one column that gives up room rather than takes it. Side by
                 // side with the button they were wider than a phone: the title is 32sp and the version is
@@ -2903,9 +2904,9 @@ private fun InstallStatusCard(installState: InstallUiState, onInstall: () -> Uni
         ),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 18.dp),
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             when {
                 installState.busy -> LoadingIndicator(
@@ -3475,12 +3476,27 @@ private fun InfoRow(
                 .fillMaxWidth()
                 .clip(MaterialTheme.shapes.medium)
                 .clickable(onClick = onClick)
+                .padding(vertical = 4.dp, horizontal = 4.dp)
         } else {
-            Modifier
+            Modifier.padding(vertical = 4.dp, horizontal = 4.dp)
         },
-        horizontalArrangement = Arrangement.spacedBy(13.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+            modifier = Modifier.size(38.dp),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
         Column {
             Text(label, style = MaterialTheme.typography.titleSmall)
             Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -9765,10 +9781,10 @@ internal enum class SettingsCardPosition {
  * border rather than like it was being pointed at.
  */
 internal fun settingsCardRestingRadius(position: SettingsCardPosition, top: Boolean): Dp = when {
-    position == SettingsCardPosition.Single -> 16.dp
-    position in setOf(SettingsCardPosition.GroupedSingle, SettingsCardPosition.Top) && top -> 24.dp
-    position in setOf(SettingsCardPosition.GroupedSingle, SettingsCardPosition.Bottom) && !top -> 24.dp
-    else -> 6.dp
+    position == SettingsCardPosition.Single -> 22.dp
+    position in setOf(SettingsCardPosition.GroupedSingle, SettingsCardPosition.Top) && top -> 26.dp
+    position in setOf(SettingsCardPosition.GroupedSingle, SettingsCardPosition.Bottom) && !top -> 26.dp
+    else -> 8.dp
 }
 
 /** The shape a card rests at, for something that has to be drawn around one. */
@@ -10630,7 +10646,7 @@ internal fun expressiveClickableCardShape(
     val pressed by interactionSource.collectIsPressedAsState()
     val topRadius by animateDpAsState(
         // Pressed is the one radius that is not a resting one: the card swells to show it took the tap.
-        targetValue = if (pressed) 28.dp else settingsCardRestingRadius(position, top = true),
+        targetValue = if (pressed) 30.dp else settingsCardRestingRadius(position, top = true),
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioNoBouncy,
             stiffness = Spring.StiffnessMedium,
@@ -10638,7 +10654,7 @@ internal fun expressiveClickableCardShape(
         label = "clickable-card-top-corner",
     )
     val bottomRadius by animateDpAsState(
-        targetValue = if (pressed) 28.dp else settingsCardRestingRadius(position, top = false),
+        targetValue = if (pressed) 30.dp else settingsCardRestingRadius(position, top = false),
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioNoBouncy,
             stiffness = Spring.StiffnessMedium,
