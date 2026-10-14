@@ -11,6 +11,7 @@ captures/
 keystore/
 *.jks
 *.keystore
+!signing/release.jks
 
 # A build product, and it lands *inside* the source directory: the DFRoot port's
 # CMake step compiles `splicehelper.c` and writes the binary beside it, because the

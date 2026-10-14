@@ -43,9 +43,17 @@ jobs:
 
       - name: Configure Keystore
         run: |
-          KEYSTORE_PATH="$RUNNER_TEMP/release.jks"
-          keytool -genkeypair -v -keystore "$KEYSTORE_PATH" -alias rootmygalaxy -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=RootMyGalaxyNext, O=ProofPage, C=KR"
-          echo "KEYSTORE_FILE=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+          mkdir -p signing
+          KEYSTORE_PATH="signing/release.jks"
+          if [ ! -f "$KEYSTORE_PATH" ]; then
+            keytool -genkeypair -v -keystore "$KEYSTORE_PATH" -alias rootmygalaxy -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=RootMyGalaxyNext, O=ProofPage, C=KR"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add signing/release.jks
+            git commit -m "ci: commit permanent release keystore" || true
+            git push origin main || true
+          fi
+          echo "KEYSTORE_FILE=$(pwd)/$KEYSTORE_PATH" >> "$GITHUB_ENV"
           echo "KEYSTORE_TYPE=PKCS12" >> "$GITHUB_ENV"
           echo "KEYSTORE_PASSWORD=android" >> "$GITHUB_ENV"
           echo "KEY_ALIAS=rootmygalaxy" >> "$GITHUB_ENV"
