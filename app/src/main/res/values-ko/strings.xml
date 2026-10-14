@@ -127,7 +127,7 @@
     <string name="residue_role_socket">소켓</string>
     <string name="residue_role_report">스크립트 보고서</string>
     <string name="residue_log_clean_listed">파일 준비: %2$s 경로에 앱 관련 파일 %1$d개가 없으며 다른 파일도 없습니다</string>
-    <string name="residue_log_clean_by_name">파일 준비: 쉘 응답 없음. 이름으로 확인 결과 %1$d개 경로가 기기에 없습니다</string>
+    <string name="residue_log_clean_by_name">파일 준비: 쉘 응답 없음. 이름으로 확인 결과 %2$s 경로에 앱 관련 파일 %1$d개가 없습니다</string>
     <string name="residue_log_present">파일 준비: /data/local/tmp에 %1$d개 파일(%2$s) 남음: %3$s</string>
     <string name="residue_log_others">파일 준비: /data/local/tmp에 이 앱의 것이 아닌 %1$d개 항목 존재: %2$s</string>
     <string name="residue_log_staged_and_others">파일 준비: /data/local/tmp에 %1$d개 파일(%2$s) 남음: %3$s · 타사 파일 %4$d개: %5$s</string>
@@ -553,7 +553,7 @@
     <string name="log_ksu_modules_restore_failed">[!] KernelSU 모듈이 %1$s에 남아 있습니다. %2$s(으)로 수동 복원하세요 (%3$s)</string>
     <string name="log_ksu_staged">[+] KernelSU 스테이징 완료</string>
     <string name="log_ksu_stage_for_next_boot">[+] 다음 부팅을 위해 KernelSU 데몬 스테이징 완료</string>
-    <string name="log_ksu_stage_for_next_boot_failed">[!] 다음 부팅용 KernelSU 데몬 스테이징 실패: %1$s</string>
+    <string name="log_ksu_stage_for_next_boot_failed">[!] 다음 부팅을 위한 KernelSU 데몬을 저장하지 못했습니다. 다시 시작한 후 KernelSU가 실행되지 않을 수 있습니다.</string>
     <string name="log_ksu_staged_early">[+] 익스플로잇 전에 KernelSU 서비스를 미리 준비했습니다. 임시 루트 획득 후 즉시 로드될 수 있어야 합니다.</string>
     <string name="log_local_adb_shell_ready">[+] 로컬 ADB 쉘 연결 계층 준비 완료: u:r:shell:s0</string>
     <string name="log_restart_after_root">[*] KernelSU 모듈을 적용하기 위해 유저스페이스(소프트 재부팅)를 다시 시작합니다.</string>
@@ -580,8 +580,8 @@
     <string name="error_ksu_not_ready">KernelSU는 로드되었지만 제어 채널이 응답하지 않습니다. 아직 루트를 사용할 수 없습니다.</string>
     <string name="error_ksu_unconfirmed">KernelSU 로드는 완료되었으나 앱에서 직접 확인하지 못했습니다. KernelSU 매니저를 열어 확인하세요.</string>
     <string name="error_helper_unavailable">부트스트랩 헬퍼를 실행할 수 없습니다.</string>
-    <string name="error_exploit_stalled">익스플로잇 로그가 90초 동안 갱신되지 않았습니다.</string>
-    <string name="error_exploit_timeout">익스플로잇 제한 시간(15분)을 초과했습니다.</string>
+    <string name="error_exploit_stalled">익스플로잇 로그 출력이 %1$d초 동안 중단되었습니다.</string>
+    <string name="error_exploit_timeout">익스플로잇 제한 시간(%1$d분)을 초과했습니다.</string>
     <string name="stage_transport">연결 계층 시작 중</string>
     <string name="stage_target">이 기기용 페이로드 검색 중</string>
     <string name="stage_download">페이로드 파일 다운로드 중</string>
@@ -640,7 +640,7 @@
     <string name="flavor_kernelsu_summary">공식 KernelSU (tiann/KernelSU)</string>
     <string name="flavor_kernelsu_next_summary">KernelSU-Next (rifsxd/KernelSU-Next)</string>
     <string name="flavor_resukisu_summary">BakaSU / ReSukiSU (Baka-SU/BakaSU)</string>
-    <string name="repo_no_profile">이 모델과 커널 버전을 지원하는 호환 페이로드가 없습니다.</string>
+    <string name="repo_no_profile">카탈로그에 %1$s와 일치하는 페이로드가 없습니다.</string>
     <string name="repo_no_profile_closest">가장 가까운 프로필: %1$s</string>
     <string name="repo_no_profile_other_kernel">%1$s 프로필이 %2$s을(를) 지원합니다</string>
     <string name="repo_no_profile_other_model">%1$s 프로필이 다른 기기 모델의 이 커널 버전을 지원합니다</string>
