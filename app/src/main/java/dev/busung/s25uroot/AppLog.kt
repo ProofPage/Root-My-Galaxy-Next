@@ -322,7 +322,7 @@ internal object AppLogFormat {
 
     /** The stamp as the file writes it, so the screen shows exactly what the file holds. */
     fun stamp(atMillis: Long): String =
-        stampFormat.get().format(Date(atMillis))
+        stampFormat.get()?.format(Date(atMillis)).orEmpty()
 
     private fun stampOf(
         month: String,

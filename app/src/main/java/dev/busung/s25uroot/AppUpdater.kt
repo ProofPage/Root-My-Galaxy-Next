@@ -19,7 +19,7 @@ data class UpdateInfo(
     val releaseUrl: String,
 )
 
-const val ROOT_MY_GALAXY_URL = "https://github.com/rushiranpise/Root-My-Galaxy-Next"
+const val ROOT_MY_GALAXY_URL = "https://github.com/ProofPage/Root-My-Galaxy-Next"
 
 object AppUpdater {
 
@@ -33,7 +33,7 @@ object AppUpdater {
     // repository with a redirect that still works today, which is exactly why the name matters: this URL
     // decides which APK the app downloads and prompts someone to install, and a name nobody is holding is
     // a name somebody else can. The full name is what the GitHub API reports for the repository's id.
-    private const val GITHUB_API = "https://api.github.com/repos/rushiranpise/Root-My-Galaxy-Next"
+    private const val GITHUB_API = "https://api.github.com/repos/ProofPage/Root-My-Galaxy-Next"
     private const val RELEASES_PAGE = "$ROOT_MY_GALAXY_URL/releases/latest"
 
     suspend fun fetchLatestRelease(): UpdateInfo? = withContext(Dispatchers.IO) {
