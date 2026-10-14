@@ -717,8 +717,6 @@ internal object DfrInstall {
         // was just told.
         append("if [ -z \"${'$'}want\" ] && [ -s '").append(payloadDaemon.orEmpty())
             .append("' ]; then want=").append(shaOf(payloadDaemon.orEmpty())).append("; fi; ")
-        append("if [ -z \"${'$'}want\" ] && [ -s '").append(INSTALLED_DAEMON)
-            .append("' ]; then want=").append(shaOf(INSTALLED_DAEMON)).append("; fi; ")
         append("if [ -z \"${'$'}want\" ]; then echo '[x] the payload daemon for this device is not known, so ")
             .append("nothing is staged: a daemon this app did not take from the payload belongs to whichever ")
             .append("KernelSU this phone runs'; exit 3; fi; ")

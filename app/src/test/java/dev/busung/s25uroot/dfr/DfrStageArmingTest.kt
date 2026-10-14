@@ -208,11 +208,6 @@ class DfrStageArmingTest {
             "the check does not inspect the installed running daemon when payloadSha256 is absent",
             check.contains(DfrInstall.INSTALLED_DAEMON),
         )
-        val staging = DfrInstall.stageDaemonCommand(payloadDaemon = null, payloadSha256 = null)
-        assertTrue(
-            "the staging does not inspect the installed running daemon when payloadSha256 is absent",
-            staging.contains(DfrInstall.INSTALLED_DAEMON),
-        )
     }
 
     @Test
