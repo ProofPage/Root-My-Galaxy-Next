@@ -1011,7 +1011,9 @@ private fun RootApp(
     }
     // The grant this app can ask for and Shizuku sends no callback about, in the one shape both screens
     // need: whether it landed, so the caller can decide what its own switch or row should say now.
-    val requestShizukuPermission: suspend () -> Boolean = { ShizukuController.requestPermission() }
+    val requestShizukuPermission: suspend () -> Boolean = {
+        runCatching { ShizukuController.requestPermission() }.getOrDefault(false)
+    }
 
     shizukuStartResult?.let { result ->
         AlertDialog(
@@ -1368,6 +1370,9 @@ private fun RootApp(
     // too: the manager this app would install for the payload's flavour is another app's business, and the
     // sheet that offers to install it has to be right about it when the app comes back from the installer.
     var resumeTick by remember { mutableStateOf(0) }
+    // Refresh the service card after the root-side restaging completes; its initial read can otherwise win
+    // the race and leave an obsolete Absent warning visible after the file has been written.
+    var daemonStageRefreshTick by remember { mutableStateOf(0) }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -1518,16 +1523,34 @@ private fun RootApp(
     // failed. Nothing is asked of a phone without root, and an app that already armed this boot copies
     // nothing: see [DfrInstall.armStageForNextBoot] for the check that makes that true.
     LaunchedEffect(resumeTick) {
-        withContext(Dispatchers.IO) {
-            if (DfrInstall.armStageForNextBoot(context) == DfrStageArming.Failed) {
-                // Said, because it is the one outcome here that the next boot cannot recover from on its
-                // own: silently, the phone would simply be unrerootable after a restart.
-                AppLog.warn(
-                    AppLogTags.KERNEL_SU,
-                    "The KernelSU daemon is not staged for the next boot: a reboot without root would " +
-                        "have nothing to late-load",
-                )
-            }
+        val arming = try {
+            withContext(Dispatchers.IO) { DfrInstall.armStageForNextBoot(context) }
+        } catch (error: Exception) {
+            AppLog.warn(
+                AppLogTags.KERNEL_SU,
+                "Could not check KernelSU service staging after resume: ${error.message ?: error.javaClass.simpleName}",
+            )
+            DfrStageArming.Failed
+        }
+        if (arming == DfrStageArming.Failed) {
+            // Said, because it is the one outcome here that the next boot cannot recover from on its
+            // own: silently, the phone would simply be unrerootable after a restart.
+            AppLog.warn(
+                AppLogTags.KERNEL_SU,
+                "The KernelSU daemon is not staged for the next boot: a reboot without root would " +
+                    "have nothing to late-load",
+            )
+        }
+        // Settings may have read before `armStageForNextBoot` wrote the file. Ask again after the write so
+        // the card reports the device's current state, not the pre-staging snapshot.
+        daemonStageRefreshTick++
+    }
+
+    // A universal run writes the stage file before moving to Installed. Refresh the settings read at that
+    // boundary too; this run stays in the foreground, so ON_RESUME would otherwise never fire.
+    LaunchedEffect(installState.phase, installState.kind) {
+        if (installState.phase == InstallPhase.Installed && installState.kind == RunKind.Universal) {
+            daemonStageRefreshTick++
         }
     }
 
@@ -1633,6 +1656,7 @@ private fun RootApp(
                             payloadMode = payloadMode,
                             batteryUnrestricted = batteryUnrestricted,
                             resumeTick = resumeTick,
+                            daemonStageRefreshTick = daemonStageRefreshTick,
                             onAccentColorChanged = onAccentColorChanged,
                             onThemeModeChanged = onThemeModeChanged,
                             onDisableKsuModulesChanged = onDisableKsuModulesChanged,
@@ -4742,6 +4766,8 @@ private fun SettingsPage(
      * is, instead of waiting for the app to be restarted or the flavour to be changed.
      */
     resumeTick: Int,
+    /** Changes after the root-side service restage so the settings card can refresh its pre-boot read. */
+    daemonStageRefreshTick: Int,
     onAccentColorChanged: (AccentColor) -> Unit,
     onThemeModeChanged: (AppThemeMode) -> Unit,
 	onDisableKsuModulesChanged: (Boolean) -> Unit,
@@ -5919,7 +5945,7 @@ private fun SettingsPage(
                 // back, and the reboot that follows is the boot this row is about. Read through a shell
                 // and off the main thread, on the same terms as the readings card above.
                 var daemonStage by remember { mutableStateOf<DfrStageReading?>(null) }
-                LaunchedEffect(kernelsuFlavor, resumeTick) {
+                LaunchedEffect(kernelsuFlavor, resumeTick, daemonStageRefreshTick) {
                     daemonStage = withContext(Dispatchers.IO) { DfrInstall.readDaemonStage(context) }
                 }
                 SettingsCard(

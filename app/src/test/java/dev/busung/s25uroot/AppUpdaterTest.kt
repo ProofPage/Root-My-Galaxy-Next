@@ -1,5 +1,7 @@
 package dev.busung.s25uroot
 
+import org.json.JSONArray
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -72,5 +74,37 @@ class AppUpdaterTest {
         assertEquals("0.2.65", AppUpdater.versionBase("0.2.65+ci.42.4f9a2c1"))
         assertEquals("0.2.65", AppUpdater.versionBase("0.2.65-rc1"))
         assertNull(AppUpdater.versionBase(""))
+    }
+
+    @Test
+    fun releaseApkIsPreferredOverDebugApk() {
+        val assets = JSONArray().apply {
+            put(
+                JSONObject().apply {
+                    put("name", "RootMyGalaxyNext-0.13.2-debug.apk")
+                    put("browser_download_url", "https://example.com/debug.apk")
+                },
+            )
+            put(
+                JSONObject().apply {
+                    put("name", "RootMyGalaxyNext-0.13.2.apk")
+                    put("browser_download_url", "https://example.com/release.apk")
+                },
+            )
+        }
+        assertEquals("https://example.com/release.apk", AppUpdater.pickApkUrl(assets))
+    }
+
+    @Test
+    fun fallbackToDebugApkWhenNoReleaseApkExists() {
+        val assets = JSONArray().apply {
+            put(
+                JSONObject().apply {
+                    put("name", "RootMyGalaxyNext-0.13.2-debug.apk")
+                    put("browser_download_url", "https://example.com/debug.apk")
+                },
+            )
+        }
+        assertEquals("https://example.com/debug.apk", AppUpdater.pickApkUrl(assets))
     }
 }

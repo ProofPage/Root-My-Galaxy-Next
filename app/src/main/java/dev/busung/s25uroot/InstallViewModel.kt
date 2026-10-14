@@ -792,6 +792,44 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
                         "says ${AppPreferences.kernelsuFlavor(app).label} - change it in Settings to match.",
                 )
             }
+
+            // DirtyFrag's daemon consumes /data/local/tmp/.ksud-stage while it late-loads KernelSU. This
+            // flow can finish without returning to the foreground, so the resume hook cannot be relied on
+            // to put the daemon back. Re-arm it now while the user is still watching the successful run.
+            // The exploit itself does not grant this app KSU access; if the user has not approved the app
+            // yet, say exactly what they need to do instead of leaving a stale Absent status unexplained.
+            val stagedForNextBoot = withContext(Dispatchers.IO) {
+                val command = DfrInstall.stageDaemonCommand(
+                    payloadDaemon = daemon.absolutePath,
+                    expectedVersion = plan.version,
+                )
+                DfrInstall.runAction(command)
+            }
+            if (stagedForNextBoot?.ok == true && stagedForNextBoot.log.contains("[+] staged")) {
+                appendLog(
+                    listOf(
+                        app.getString(R.string.log_ksu_stage_for_next_boot),
+                        stagedForNextBoot.log.trim(),
+                    ).filter(String::isNotBlank).joinToString("\n"),
+                )
+            } else {
+                val explanation = if (stagedForNextBoot == null) {
+                    app.getString(R.string.recovery_shell_unavailable)
+                } else {
+                    stagedForNextBoot.log.ifBlank { "command failed" }
+                }
+                appendLog(
+                    listOf(
+                        app.getString(R.string.log_ksu_stage_for_next_boot_failed),
+                        explanation,
+                    ).filter(String::isNotBlank).joinToString("\n"),
+                )
+                AppLog.warn(
+                    AppLogTags.KERNEL_SU,
+                    "Universal run rooted the phone, but could not re-stage the KernelSU daemon for next boot: " +
+                        explanation,
+                )
+            }
             setPhase(InstallPhase.Installed, app.getString(installedMessage))
             endUniversalNotification()
 

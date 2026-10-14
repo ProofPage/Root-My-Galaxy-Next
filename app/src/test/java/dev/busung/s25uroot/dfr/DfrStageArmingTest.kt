@@ -269,6 +269,29 @@ class DfrStageArmingTest {
     }
 
     @Test
+    fun `a successful universal run restores the daemon stage before it finishes`() {
+        val body = declaration(viewModelSource(), "fun startUniversalRun(")
+        val verdict = body.indexOf("UniversalRootRun.verdict(code, reading, canRead)")
+        val staging = body.indexOf("DfrInstall.stageDaemonCommand(")
+        val finished = body.indexOf("setPhase(InstallPhase.Installed")
+
+        assertTrue("the universal run no longer judges the root result", verdict >= 0)
+        assertTrue("the universal run no longer re-stages the daemon", staging >= 0)
+        assertTrue(
+            "the daemon is not re-staged after root succeeds and before the run is marked finished",
+            verdict < staging && staging < finished,
+        )
+        assertTrue(
+            "the restored daemon is no longer the exact file this run loaded",
+            body.contains("payloadDaemon = daemon.absolutePath"),
+        )
+        assertTrue(
+            "a denied root shell no longer tells the user to grant this app access",
+            body.contains("R.string.recovery_shell_unavailable"),
+        )
+    }
+
+    @Test
     fun `a screen that comes back to the foreground arms it too, off the main thread`() {
         val shell = block(shellSource(), "LaunchedEffect(resumeTick) {")
         assertTrue(
@@ -290,6 +313,12 @@ class DfrStageArmingTest {
         assertFalse(
             "the shell reports the phone simply having no root, which is a state rather than a fault",
             shell.contains("DfrStageArming.NoRoot"),
+        )
+        assertTrue(
+            "the settings card is not refreshed after universal root stages the daemon while the app stays " +
+                "in the foreground",
+            shellSource().contains("installState.phase == InstallPhase.Installed && " +
+                "installState.kind == RunKind.Universal"),
         )
         // One call and no second one: a screen that armed it somewhere of its own would be a second place
         // for the check-inside-the-arming to be forgotten, and the cost of forgetting it is a five-megabyte

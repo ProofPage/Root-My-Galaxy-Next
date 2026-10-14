@@ -98,7 +98,13 @@ object ShizukuController {
                 Shizuku.requestPermission(PERMISSION_REQUEST_CODE)
             } catch (error: Throwable) {
                 Shizuku.removeRequestPermissionResultListener(listener)
-                continuation.resumeWithException(error)
+                AppLog.warn(
+                    AppLogTags.SHIZUKU,
+                    "Failed to ask Shizuku for permission: ${error.message ?: error.javaClass.simpleName}",
+                )
+                if (continuation.isActive) {
+                    continuation.resume(false)
+                }
             }
         }
     }

@@ -50,16 +50,7 @@ object AppUpdater {
                 val json = JSONObject(body)
                 val tag = json.optString("tag_name").trim().removePrefix("v")
                 if (tag.isBlank()) return@withContext null
-                var apkUrl: String? = null
-                json.optJSONArray("assets")?.let { assets ->
-                    for (i in 0 until assets.length()) {
-                        val asset = assets.getJSONObject(i)
-                        if (asset.optString("name").endsWith(".apk")) {
-                            apkUrl = asset.optString("browser_download_url").ifEmpty { null }
-                            break
-                        }
-                    }
-                }
+                val apkUrl = json.optJSONArray("assets")?.let { pickApkUrl(it) }
                 UpdateInfo(
                     versionName = tag,
                     apkUrl = apkUrl,
@@ -71,6 +62,30 @@ object AppUpdater {
         } catch (_: Exception) {
             null
         }
+    }
+
+    /**
+     * Picks the best APK download URL from release assets, preferring release APKs over debug APKs.
+     */
+    internal fun pickApkUrl(assets: JSONArray): String? {
+        var apkUrl: String? = null
+        var fallbackApkUrl: String? = null
+        for (i in 0 until assets.length()) {
+            val asset = assets.getJSONObject(i)
+            val name = asset.optString("name")
+            if (name.endsWith(".apk")) {
+                val downloadUrl = asset.optString("browser_download_url").ifEmpty { null }
+                if (downloadUrl != null) {
+                    if (!name.contains("debug", ignoreCase = true)) {
+                        apkUrl = downloadUrl
+                        break
+                    } else if (fallbackApkUrl == null) {
+                        fallbackApkUrl = downloadUrl
+                    }
+                }
+            }
+        }
+        return apkUrl ?: fallbackApkUrl
     }
 
     /**

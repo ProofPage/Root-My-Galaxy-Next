@@ -210,8 +210,8 @@ class AdbPairingClient(
     }
 
     override fun close() {
-        runCatching { protocol.close() }
-        runCatching { socket.close() }
+        if (::protocol.isInitialized) runCatching { protocol.close() }
+        if (::socket.isInitialized) runCatching { socket.close() }
     }
 
     companion object {

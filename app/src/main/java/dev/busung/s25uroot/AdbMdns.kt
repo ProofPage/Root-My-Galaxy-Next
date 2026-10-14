@@ -45,7 +45,10 @@ class AdbMdns(
             // A fresh resolve listener per call, deliberately: NsdManager refuses a listener that is
             // already resolving, and several services can be announced before the first resolve
             // finishes - which would otherwise crash the app at the moment it is trying to pair.
-            nsdManager.resolveService(serviceInfo, createResolveListener())
+            runCatching { nsdManager.resolveService(serviceInfo, createResolveListener()) }
+                .onFailure { error ->
+                    AppLog.warn(AppLogTags.WIRELESS_ADB, "mDNS resolveService failed: ${error.message}")
+                }
         }
 
         override fun onServiceLost(serviceInfo: NsdServiceInfo) {
