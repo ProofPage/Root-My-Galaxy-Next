@@ -16,6 +16,9 @@ import dev.busung.s25uroot.RootStatusProbe
 import dev.busung.s25uroot.SYSTEM_HELPER_DAEMON
 import dev.busung.s25uroot.SYSTEM_STAGED_DAEMON
 import dev.busung.s25uroot.ShizukuController
+import dev.busung.s25uroot.UniversalDaemonStore
+import dev.busung.s25uroot.UniversalRootRun
+import dev.busung.s25uroot.fileMatchesArtifact
 import dev.busung.s25uroot.sha256Of
 import java.io.File
 
@@ -778,13 +781,13 @@ internal object DfrInstall {
     /**
      * Runs [stageDaemonCommand] as root, or null when no root shell answered.
      *
-     * The payload's own daemon is read first and its digest passed in, because that digest is what decides
-     * which copy may be staged at all - and it comes from the verified cache rather than a download, so
-     * this costs a hash rather than a network round trip. The running daemon's version goes with it as the
-     * reading that says whether the copy staged is also the one this boot is running.
+     * A verified cached daemon is read first and its digest passed in, because that digest is what decides
+     * which copy may be staged at all - and it comes from a verified cache rather than a download, so this
+     * costs a hash rather than a network round trip. The running daemon's version goes with it as the reading
+     * that says whether the copy staged is also the one this boot is running.
      */
     fun stageDaemon(context: Context): DfrAction? {
-        val daemon = payloadDaemon(context)
+        val daemon = daemonForStage(context)
         return stageDaemonAs(
             payloadDaemon = daemon?.absolutePath,
             payloadSha256 = daemon?.let { runCatching { sha256Of(it) }.getOrNull() },
@@ -820,18 +823,25 @@ internal object DfrInstall {
         runCatching { KernelSuVersionProbe.read(context).daemon }.getOrNull()
 
     /**
-     * The daemon this device's payload ships, as the verified copy this app keeps of it.
+     * A verified daemon this app has staged for this device, from either root flow.
      *
-     * Null is "no verified payload is cached", which the staging reports instead of working around: the
-     * installed daemon belongs to whichever KernelSU this phone happens to run, and handing *that* to the
-     * exploit is what panics the kernel on a phone whose payload is another project's build.
+     * Payload runs keep their verified copy in [KnownGoodPayloadStore]. The standalone DirtyFrag flow keeps
+     * its daemon in device-protected storage and records the source artifact in [UniversalDaemonStore]. A
+     * stage read that only looked in the payload cache could see the universal daemon file on the phone but
+     * had no expected digest, so it reported `Not compared` after a successful universal run. The universal
+     * copy is accepted only while it still matches the recorded artifact's size and digest.
      */
-    private fun payloadDaemon(context: Context): File? =
+    private fun daemonForStage(context: Context): File? =
         runCatching { KnownGoodPayloadStore.daemon(context) }.getOrNull()
+            ?: runCatching {
+                val recorded = UniversalDaemonStore.describe(context) ?: return null
+                val daemon = UniversalRootRun.daemonPath(context)
+                daemon.takeIf { fileMatchesArtifact(it, recorded.artifact) }
+            }.getOrNull()
 
-    /** The payload daemon's digest, or null when there is no payload daemon to hash. */
+    /** The trusted stage candidate's digest, or null when no verified daemon is cached. */
     private fun payloadDaemonSha256(context: Context): String? =
-        payloadDaemon(context)?.let { daemon -> runCatching { sha256Of(daemon) }.getOrNull() }
+        daemonForStage(context)?.let { daemon -> runCatching { sha256Of(daemon) }.getOrNull() }
 
     /**
      * What a file on the device hashes to, in one command.
@@ -942,7 +952,7 @@ internal object DfrInstall {
      */
     fun armStageForNextBoot(context: Context): DfrStageArming {
         if (!RootStatusProbe.isActive()) return DfrStageArming.NoRoot
-        val daemon = payloadDaemon(context)
+        val daemon = daemonForStage(context)
         val sha = daemon?.let { runCatching { sha256Of(it) }.getOrNull() }
         val reading = KernelSuRuntime.rootShell(
             stageArmedCommand(payloadSha256 = sha),

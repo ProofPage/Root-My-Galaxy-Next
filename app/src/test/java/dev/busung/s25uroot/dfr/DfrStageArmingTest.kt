@@ -175,6 +175,33 @@ class DfrStageArmingTest {
     }
 
     @Test
+    fun `the universal daemon is a verified comparison source for stage status`() {
+        val candidate = declaration(installSource(), "private fun daemonForStage(")
+        assertTrue(
+            "the known-good payload daemon stopped being the first trusted comparison source",
+            candidate.contains("KnownGoodPayloadStore.daemon(context)"),
+        )
+        assertTrue(
+            "the standalone DirtyFrag daemon is ignored when there is no known-good payload cache",
+            candidate.contains("UniversalDaemonStore.describe(context)"),
+        )
+        assertTrue(
+            "a cached universal daemon is trusted without validating it against its recorded artifact",
+            candidate.contains("fileMatchesArtifact(it, recorded.artifact)"),
+        )
+        assertTrue(
+            "the service status is still compared without the trusted daemon digest",
+            declaration(installSource(), "fun readDaemonStage(")
+                .contains("stageArmedCommand(payloadSha256 = payloadDaemonSha256(context))"),
+        )
+        assertTrue(
+            "resume-time re-arming does not use the same verified source as the status read",
+            declaration(installSource(), "fun armStageForNextBoot(")
+                .contains("val daemon = daemonForStage(context)"),
+        )
+    }
+
+    @Test
     fun `arming is asked of the phone, and refused before anything is run when it has no root`() {
         val body = declaration(installSource(), "fun armStageForNextBoot(")
         assertTrue(
