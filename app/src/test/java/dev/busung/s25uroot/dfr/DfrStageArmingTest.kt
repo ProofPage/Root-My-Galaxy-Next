@@ -202,6 +202,20 @@ class DfrStageArmingTest {
     }
 
     @Test
+    fun `the check falls back to the running daemon when no payload digest is cached`() {
+        val check = DfrInstall.stageArmedCommand(payloadSha256 = null)
+        assertTrue(
+            "the check does not inspect the installed running daemon when payloadSha256 is absent",
+            check.contains(DfrInstall.INSTALLED_DAEMON),
+        )
+        val staging = DfrInstall.stageDaemonCommand(payloadDaemon = null, payloadSha256 = null)
+        assertTrue(
+            "the staging does not inspect the installed running daemon when payloadSha256 is absent",
+            staging.contains(DfrInstall.INSTALLED_DAEMON),
+        )
+    }
+
+    @Test
     fun `arming is asked of the phone, and refused before anything is run when it has no root`() {
         val body = declaration(installSource(), "fun armStageForNextBoot(")
         assertTrue(
