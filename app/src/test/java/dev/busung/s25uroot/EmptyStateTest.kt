@@ -59,16 +59,12 @@ class EmptyStateTest {
     }
 
     @Test
-    fun `an empty history leads to where a run is started`() {
+    fun `an empty history card is displayed when no runs exist`() {
         val source = mainActivity()
 
         assertTrue(
-            "the empty history card is not offered the way to Home",
+            "the empty history card is not present",
             source.contains("EmptyHistoryCard(onOpenHome)"),
-        )
-        assertTrue(
-            "Home is not what the card's action goes to",
-            source.contains("onOpenHome = { selectedPage = AppPage.Overview }"),
         )
     }
 

@@ -4128,26 +4128,30 @@ private fun EmptyHistoryCard(onOpenHome: () -> Unit) {
         ),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 18.dp),
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Icon(Icons.Rounded.History, contentDescription = null, modifier = Modifier.size(32.dp))
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(stringResource(R.string.history_empty_title), style = MaterialTheme.typography.titleMedium)
+            Surface(
+                shape = RoundedCornerShape(14.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                modifier = Modifier.size(44.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        Icons.Rounded.History,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(stringResource(R.string.history_empty_title), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
                 Text(
                     stringResource(R.string.history_empty_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                AppActionButton(
-                    AppAction(
-                        label = R.string.history_empty_action,
-                        role = AppActionRole.Priority,
-                    ) {
-                        clickHaptic(view)
-                        onOpenHome()
-                    },
                 )
             }
         }
