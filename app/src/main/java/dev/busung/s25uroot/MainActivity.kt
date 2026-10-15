@@ -2965,7 +2965,7 @@ private fun InstallStatusCard(installState: InstallUiState, onInstall: () -> Uni
                             tint = verdict.content,
                         )
                         else -> Icon(
-                            Icons.Rounded.RocketLaunch, contentDescription = null, modifier = Modifier.size(32.dp),
+                            Icons.Rounded.Bolt, contentDescription = null, modifier = Modifier.size(32.dp),
                             tint = verdict.content,
                         )
                     }
