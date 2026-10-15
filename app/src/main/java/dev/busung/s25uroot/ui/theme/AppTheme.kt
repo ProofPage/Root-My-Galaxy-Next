@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,21 +28,26 @@ import com.materialkolor.rememberDynamicColorScheme
 import dev.busung.s25uroot.AccentColor
 import dev.busung.s25uroot.AppThemeMode
 import dev.busung.s25uroot.HelperTint
+import dev.busung.s25uroot.R
 import dev.busung.s25uroot.VerdictTint
 
+private val Pretendard = FontFamily(
+    Font(R.font.pretendard_variable),
+)
+
 private val AppTypography = Typography(
-    displaySmall = TextStyle(fontSize = 38.sp, lineHeight = 44.sp, fontWeight = FontWeight.Normal),
-    headlineLarge = TextStyle(fontSize = 32.sp, lineHeight = 38.sp, fontWeight = FontWeight.SemiBold),
-    headlineMedium = TextStyle(fontSize = 28.sp, lineHeight = 34.sp, fontWeight = FontWeight.SemiBold),
-    headlineSmall = TextStyle(fontSize = 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.SemiBold),
-    titleLarge = TextStyle(fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold),
-    titleMedium = TextStyle(fontSize = 17.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium),
-    titleSmall = TextStyle(fontSize = 15.sp, lineHeight = 21.sp, fontWeight = FontWeight.Medium),
-    bodyLarge = TextStyle(fontSize = 16.sp, lineHeight = 24.sp, fontWeight = FontWeight.Normal),
-    bodyMedium = TextStyle(fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Normal),
-    bodySmall = TextStyle(fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Normal),
-    labelLarge = TextStyle(fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold),
-    labelMedium = TextStyle(fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
+    displaySmall = TextStyle(fontFamily = Pretendard, fontSize = 38.sp, lineHeight = 44.sp, fontWeight = FontWeight.Normal),
+    headlineLarge = TextStyle(fontFamily = Pretendard, fontSize = 32.sp, lineHeight = 38.sp, fontWeight = FontWeight.SemiBold),
+    headlineMedium = TextStyle(fontFamily = Pretendard, fontSize = 28.sp, lineHeight = 34.sp, fontWeight = FontWeight.SemiBold),
+    headlineSmall = TextStyle(fontFamily = Pretendard, fontSize = 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.SemiBold),
+    titleLarge = TextStyle(fontFamily = Pretendard, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold),
+    titleMedium = TextStyle(fontFamily = Pretendard, fontSize = 17.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium),
+    titleSmall = TextStyle(fontFamily = Pretendard, fontSize = 15.sp, lineHeight = 21.sp, fontWeight = FontWeight.Medium),
+    bodyLarge = TextStyle(fontFamily = Pretendard, fontSize = 16.sp, lineHeight = 24.sp, fontWeight = FontWeight.Normal),
+    bodyMedium = TextStyle(fontFamily = Pretendard, fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Normal),
+    bodySmall = TextStyle(fontFamily = Pretendard, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Normal),
+    labelLarge = TextStyle(fontFamily = Pretendard, fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold),
+    labelMedium = TextStyle(fontFamily = Pretendard, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
 )
 
 private val AppShapes = Shapes(
