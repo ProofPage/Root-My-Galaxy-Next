@@ -2006,52 +2006,54 @@ private fun OverviewPage(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 54.dp, bottom = 14.dp),
+                    .padding(top = 44.dp, bottom = 12.dp, start = 4.dp, end = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_app_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(36.dp),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-                // The name and the build are one column that gives up room rather than takes it. Side by
-                // side with the button they were wider than a phone: the title is 32sp and the version is
-                // a whole build label, and a Row hands its unweighted children the width they ask for - so
-                // the button was pushed past the right edge and clipped by the list. It was there on a
-                // tablet and gone on a phone, which is the shape of a bug this header had no room to show.
-                //
-                // Medium rather than large since the fork's own name: "Root My Galaxy Next" is a third
-                // longer than the name this header was laid out for, and at 32sp it ended in an ellipsis on
-                // a phone - the app's own name, unreadable on the screen that shows it. 28sp is the largest
-                // step that fits all of it beside the power button.
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+                    modifier = Modifier.size(44.dp),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_app_logo),
+                            contentDescription = null,
+                            modifier = Modifier.size(28.dp),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     AppVersionText(
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                // Where the KernelSU manager keeps its own power menu, and for the same reason: a way out
-                // of the running Android is not a setting, it is the thing you reach for while looking at
-                // the phone. What this device can actually do is decided inside.
-                IconButton(
-                    onClick = {
-                        clickHaptic(view)
-                        onOpenReboot()
-                    },
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    modifier = Modifier.size(40.dp),
                 ) {
-                    Icon(
-                        Icons.Rounded.PowerSettingsNew,
-                        contentDescription = stringResource(R.string.reboot_sheet_title),
-                        modifier = Modifier.size(22.dp),
-                    )
+                    IconButton(
+                        onClick = {
+                            clickHaptic(view)
+                            onOpenReboot()
+                        },
+                    ) {
+                        Icon(
+                            Icons.Rounded.PowerSettingsNew,
+                            contentDescription = stringResource(R.string.reboot_sheet_title),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
                 }
             }
         }
@@ -2653,22 +2655,35 @@ private fun HomeLinkRow(
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            if (busy) {
-                LoadingIndicator(modifier = Modifier.size(28.dp))
-            } else {
-                Icon(icon, contentDescription = null, modifier = Modifier.size(28.dp))
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                modifier = Modifier.size(36.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    if (busy) {
+                        LoadingIndicator(modifier = Modifier.size(20.dp))
+                    } else {
+                        Icon(
+                            icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
             }
             Text(
                 title,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
                 modifier = Modifier.weight(1f),
             )
             if (value.isNotBlank()) {
                 Text(
                     value,
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
                     color = MaterialTheme.colorScheme.primary,
                     // Capped like a settings card's value: an unweighted Row child is measured before
                     // the weighted one beside it, so a long one would leave the title a character per
@@ -2677,6 +2692,13 @@ private fun HomeLinkRow(
                     textAlign = TextAlign.End,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                )
+            } else {
+                Icon(
+                    Icons.Rounded.ChevronRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.size(20.dp),
                 )
             }
         }
@@ -2919,23 +2941,35 @@ private fun InstallStatusCard(installState: InstallUiState, onInstall: () -> Uni
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            when {
-                installState.busy -> LoadingIndicator(
-                    modifier = Modifier.size(44.dp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-                installState.phase == InstallPhase.Installed -> Icon(
-                    Icons.Rounded.CheckCircle, contentDescription = null, modifier = Modifier.size(44.dp),
-                )
-                installState.phase == InstallPhase.RootOnly -> Icon(
-                    Icons.Rounded.LockOpen, contentDescription = null, modifier = Modifier.size(44.dp),
-                )
-                installState.phase == InstallPhase.Failed -> Icon(
-                    Icons.Rounded.Warning, contentDescription = null, modifier = Modifier.size(44.dp),
-                )
-                else -> Icon(
-                    Icons.Rounded.Warning, contentDescription = null, modifier = Modifier.size(44.dp),
-                )
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = verdict.content.copy(alpha = 0.12f),
+                modifier = Modifier.size(52.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    when {
+                        installState.busy -> LoadingIndicator(
+                            modifier = Modifier.size(32.dp),
+                            color = verdict.content,
+                        )
+                        installState.phase == InstallPhase.Installed -> Icon(
+                            Icons.Rounded.CheckCircle, contentDescription = null, modifier = Modifier.size(32.dp),
+                            tint = verdict.content,
+                        )
+                        installState.phase == InstallPhase.RootOnly -> Icon(
+                            Icons.Rounded.LockOpen, contentDescription = null, modifier = Modifier.size(32.dp),
+                            tint = verdict.content,
+                        )
+                        installState.phase == InstallPhase.Failed -> Icon(
+                            Icons.Rounded.Warning, contentDescription = null, modifier = Modifier.size(32.dp),
+                            tint = verdict.content,
+                        )
+                        else -> Icon(
+                            Icons.Rounded.RocketLaunch, contentDescription = null, modifier = Modifier.size(32.dp),
+                            tint = verdict.content,
+                        )
+                    }
+                }
             }
             Column(modifier = Modifier.weight(1f)) {
                 if (installState.phase == InstallPhase.Installed) {
@@ -2947,11 +2981,11 @@ private fun InstallStatusCard(installState: InstallUiState, onInstall: () -> Uni
                             painter = painterResource(R.drawable.ic_kernelsu),
                             contentDescription = null,
                             modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            tint = verdict.content,
                         )
                         Text(
                             text = stringResource(R.string.status_ksu_active),
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         )
                     }
                 } else {
@@ -2960,25 +2994,33 @@ private fun InstallStatusCard(installState: InstallUiState, onInstall: () -> Uni
                             InstallPhase.Ready -> stringResource(R.string.status_not_installed)
                             else -> installState.message
                         },
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     )
                 }
-                Text(
-                    text = when (installState.phase) {
-                        InstallPhase.Installed -> stringResource(
-                            if (managerInstalled) {
-                                R.string.install_tap_open_manager
-                            } else {
-                                R.string.install_tap_manager
-                            },
-                        )
-                        InstallPhase.Failed -> stringResource(R.string.install_tap_retry)
-                        else -> stringResource(R.string.install_tap_start)
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.86f),
-                    maxLines = 1,
-                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = verdict.content.copy(alpha = 0.15f),
+                    modifier = Modifier.clip(RoundedCornerShape(10.dp)),
+                ) {
+                    Text(
+                        text = when (installState.phase) {
+                            InstallPhase.Installed -> stringResource(
+                                if (managerInstalled) {
+                                    R.string.install_tap_open_manager
+                                } else {
+                                    R.string.install_tap_manager
+                                },
+                            )
+                            InstallPhase.Failed -> stringResource(R.string.install_tap_retry)
+                            else -> stringResource(R.string.install_tap_start)
+                        },
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                        color = verdict.content,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        maxLines = 1,
+                    )
+                }
             }
         }
     }
@@ -3495,30 +3537,37 @@ private fun InfoRow(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         Surface(
-            shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-            modifier = Modifier.size(38.dp),
+            shape = RoundedCornerShape(14.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            modifier = Modifier.size(42.dp),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     icon,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(22.dp),
                 )
             }
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(label, style = MaterialTheme.typography.titleSmall)
-            Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(label, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold))
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(value, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         if (onClick != null) {
-            Icon(
-                Icons.Rounded.ChevronRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                modifier = Modifier.size(20.dp),
-            )
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                modifier = Modifier.clip(RoundedCornerShape(8.dp)),
+            ) {
+                Text(
+                    text = stringResource(R.string.action_open_setting),
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                )
+            }
         }
     }
 }
