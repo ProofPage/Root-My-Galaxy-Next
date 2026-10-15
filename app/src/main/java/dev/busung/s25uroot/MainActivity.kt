@@ -1792,7 +1792,7 @@ private fun AppNavBar(
             Row(
                 modifier = Modifier
                     .selectableGroup()
-                    .padding(horizontal = 6.dp, vertical = 6.dp),
+                    .padding(horizontal = 4.dp, vertical = 6.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -3508,9 +3508,17 @@ private fun InfoRow(
                 )
             }
         }
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(label, style = MaterialTheme.typography.titleSmall)
             Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        if (onClick != null) {
+            Icon(
+                Icons.Rounded.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                modifier = Modifier.size(20.dp),
+            )
         }
     }
 }
