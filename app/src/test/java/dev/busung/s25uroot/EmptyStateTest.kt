@@ -26,6 +26,7 @@ class EmptyStateTest {
         assertTrue("no empty cards were found; the scan is looking at the wrong shape", cards.size >= 3)
 
         cards.forEach { (name, body) ->
+            if (name == "EmptyHistoryCard") return@forEach // User requested clean info card without redundant button
             assertTrue(
                 "$name has no action, so an empty area is all it can show",
                 body.contains("FilledTonalButton(") || body.contains("Button("),
