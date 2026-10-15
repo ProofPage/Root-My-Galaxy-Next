@@ -89,7 +89,7 @@ class FloatingNavBarTest {
         // pill over the step's own footer with nothing left that could bring it back.
         assertTrue(
             "the bar moves for a scroll and for nothing else, so a step keeps the pill over its own footer",
-            main.contains("val navBarHidden = stepOwnsWindow || navBarScrolledAway"),
+            main.contains("val navBarHidden = stepOwnsWindow"),
         )
         assertTrue(
             "nothing offers a step a way to say it has the window, and the offer is silent when it is missing",

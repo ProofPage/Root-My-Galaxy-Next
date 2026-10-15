@@ -1501,7 +1501,7 @@ private fun RootApp(
     // window, where there is no page under the bar to come back to.
     var navBarScrolledAway by remember { mutableStateOf(false) }
     var stepOwnsWindow by remember { mutableStateOf(false) }
-    val navBarHidden = stepOwnsWindow || navBarScrolledAway
+    val navBarHidden = stepOwnsWindow
     var navBarHeight by remember { mutableStateOf(0.dp) }
     val navBarShift by animateDpAsState(
         targetValue = if (navBarHidden) navBarHeight else 0.dp,
