@@ -1782,17 +1782,18 @@ private fun AppNavBar(
         contentAlignment = Alignment.Center,
     ) {
         Surface(
-            shape = RoundedCornerShape(50),
-            color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.94f),
+            shape = RoundedCornerShape(28.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.95f),
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             tonalElevation = 2.dp,
             shadowElevation = 8.dp,
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Row(
                 modifier = Modifier
                     .selectableGroup()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    .padding(horizontal = 6.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 AppPage.entries.forEach { page ->
@@ -1800,6 +1801,7 @@ private fun AppNavBar(
                         page = page,
                         selected = page == selected,
                         onClick = { onSelect(page) },
+                        modifier = Modifier.weight(1f),
                     )
                 }
             }
@@ -1808,7 +1810,12 @@ private fun AppNavBar(
 }
 
 @Composable
-private fun AppNavBarItem(page: AppPage, selected: Boolean, onClick: () -> Unit) {
+private fun AppNavBarItem(
+    page: AppPage,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val label = stringResource(page.label)
     val container by animateColorAsState(
         targetValue = if (selected) {
@@ -1826,33 +1833,37 @@ private fun AppNavBarItem(page: AppPage, selected: Boolean, onClick: () -> Unit)
         },
         label = "navItemContent",
     )
-    Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(container)
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(18.dp))
             .selectable(selected = selected, role = Role.Tab, onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 13.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Icon(
-            page.icon,
-            contentDescription = if (selected) null else label,
-            tint = content,
-            modifier = Modifier.size(22.dp),
-        )
-        AnimatedVisibility(
-            visible = selected,
-            enter = expandHorizontally() + fadeIn(),
-            exit = shrinkHorizontally() + fadeOut(),
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(container)
+                .padding(horizontal = 18.dp, vertical = 4.dp),
+            contentAlignment = Alignment.Center,
         ) {
-            Text(
-                label,
-                color = content,
-                style = MaterialTheme.typography.labelLarge,
-                maxLines = 1,
-                modifier = Modifier.padding(start = 8.dp),
+            Icon(
+                page.icon,
+                contentDescription = label,
+                tint = content,
+                modifier = Modifier.size(24.dp),
             )
         }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = label,
+            color = content,
+            style = if (selected) MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                    else MaterialTheme.typography.labelMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
