@@ -1782,11 +1782,11 @@ private fun AppNavBar(
         contentAlignment = Alignment.Center,
     ) {
         Surface(
-            shape = RoundedCornerShape(28.dp),
-            color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.95f),
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.98f),
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            tonalElevation = 2.dp,
-            shadowElevation = 8.dp,
+            tonalElevation = 0.dp,
+            shadowElevation = 12.dp,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Row(

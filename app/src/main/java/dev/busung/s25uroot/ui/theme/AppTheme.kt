@@ -60,7 +60,7 @@ private val AppShapes = Shapes(
 
 private fun accentSeed(context: Context, accentColor: AccentColor): Color = when (accentColor) {
     AccentColor.Dynamic -> Color(context.getColor(android.R.color.system_accent1_500))
-    AccentColor.Blue -> Color(0xFF3860F4)
+    AccentColor.Blue -> Color(0xFF3182F6) // Toss Blue
     AccentColor.Violet -> Color(0xFF7C4DFF)
     AccentColor.Green -> Color(0xFF2E7D32)
     AccentColor.Orange -> Color(0xFFE65100)
@@ -89,10 +89,30 @@ fun RootMyGalaxyTheme(
             specVersion = ColorSpec.SpecVersion.SPEC_2025,
         )
         if (darkTheme) {
-            generatedColors
+            generatedColors.copy(
+                background = Color(0xFF101012),
+                surface = Color(0xFF101012),
+                surfaceContainer = Color(0xFF101012),
+                surfaceContainerLow = Color(0xFF17171C),
+                surfaceContainerLowest = Color(0xFF101012),
+                surfaceContainerHigh = Color(0xFF1C1C22),
+                surfaceContainerHighest = Color(0xFF222228),
+                onSurface = Color(0xFFF2F4F6),
+                onSurfaceVariant = Color(0xFF8B95A1),
+                outline = Color(0xFF333D4B),
+                outlineVariant = Color(0xFF222228),
+            )
         } else {
             generatedColors.copy(
-                onSurfaceVariant = lerp(generatedColors.surface, generatedColors.onSurface, 0.8f),
+                background = Color(0xFFF2F4F6),
+                surface = Color(0xFFFFFFFF),
+                surfaceContainer = Color(0xFFF2F4F6),
+                surfaceContainerLow = Color(0xFFF9FAFB),
+                surfaceContainerLowest = Color(0xFFFFFFFF),
+                surfaceContainerHigh = Color(0xFFE5E8EB),
+                surfaceContainerHighest = Color(0xFFFFFFFF),
+                onSurface = Color(0xFF191F28),
+                onSurfaceVariant = Color(0xFF6B7684),
             )
         }
     }
